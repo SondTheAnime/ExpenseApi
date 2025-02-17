@@ -1,0 +1,153 @@
+/api/v1/expenses:
+  get:
+    tags:
+      - Despesas
+    summary: Lista todas as despesas do usuário
+    description: |
+      Retorna todas as despesas do usuário autenticado.
+      É possível filtrar por período usando query parameters.
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: start_date
+        in: query
+        description: Data inicial do período (YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        description: Data final do período (YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: category
+        in: query
+        description: Filtrar por categoria
+        schema:
+          type: string
+          enum:
+            - Mantimentos
+            - Lazer
+            - Eletrônica
+            - Utilitários
+            - Roupas
+            - Saúde
+            - Outros
+    responses:
+      '200':
+        description: Lista de despesas
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '../components/schemas/Expense.yaml#/Expense'
+      '401':
+        $ref: '../components/responses/Unauthorized.yaml'
+  
+  post:
+    tags:
+      - Despesas
+    summary: Cria uma nova despesa
+    description: Cria uma nova despesa para o usuário autenticado
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Expense.yaml#/CreateExpenseInput'
+          example:
+            description: "Compras do mês"
+            amount: 150.50
+            category: "Mantimentos"
+            date: "2024-02-17"
+    responses:
+      '201':
+        description: Despesa criada com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/Expense.yaml#/Expense'
+      '400':
+        $ref: '../components/responses/BadRequest.yaml'
+      '401':
+        $ref: '../components/responses/Unauthorized.yaml'
+
+/api/v1/expenses/{id}:
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: ID da despesa
+      schema:
+        type: string
+        format: uuid
+  
+  get:
+    tags:
+      - Despesas
+    summary: Obtém uma despesa específica
+    description: Retorna os detalhes de uma despesa específica
+    security:
+      - BearerAuth: []
+    responses:
+      '200':
+        description: Detalhes da despesa
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/Expense.yaml#/Expense'
+      '401':
+        $ref: '../components/responses/Unauthorized.yaml'
+      '404':
+        $ref: '../components/responses/NotFound.yaml'
+  
+  put:
+    tags:
+      - Despesas
+    summary: Atualiza uma despesa
+    description: Atualiza os dados de uma despesa existente
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Expense.yaml#/UpdateExpenseInput'
+          example:
+            description: "Compras do mês atualizada"
+            amount: 180.50
+            category: "Mantimentos"
+            date: "2024-02-17"
+    responses:
+      '200':
+        description: Despesa atualizada com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/Expense.yaml#/Expense'
+      '400':
+        $ref: '../components/responses/BadRequest.yaml'
+      '401':
+        $ref: '../components/responses/Unauthorized.yaml'
+      '404':
+        $ref: '../components/responses/NotFound.yaml'
+  
+  delete:
+    tags:
+      - Despesas
+    summary: Remove uma despesa
+    description: Remove uma despesa existente
+    security:
+      - BearerAuth: []
+    responses:
+      '204':
+        description: Despesa removida com sucesso
+      '401':
+        $ref: '../components/responses/Unauthorized.yaml'
+      '404':
+        $ref: '../components/responses/NotFound.yaml' 

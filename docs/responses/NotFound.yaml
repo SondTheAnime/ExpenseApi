@@ -1,0 +1,9 @@
+description: Recurso não encontrado
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Recurso não encontrado" 

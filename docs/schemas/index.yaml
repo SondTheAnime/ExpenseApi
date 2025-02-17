@@ -1,0 +1,4 @@
+User:
+  $ref: './user.yaml'
+Expense:
+  $ref: './expense.yaml' 

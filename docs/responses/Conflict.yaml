@@ -1,0 +1,12 @@
+description: Conflito
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Email já cadastrado"
+        error:
+          type: string
+          example: "Já existe um usuário cadastrado com este email" 

@@ -1,0 +1,10 @@
+description: Conflito
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+          example: "usuário já existe" 

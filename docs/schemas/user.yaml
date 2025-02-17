@@ -1,0 +1,71 @@
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Identificador único do usuário
+        email:
+          type: string
+          format: email
+          description: Email do usuário (deve ser único)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Data de criação do usuário
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Data da última atualização do usuário
+
+    CreateUserInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email do usuário (deve ser único)
+        password:
+          type: string
+          format: password
+          minLength: 6
+          description: Senha do usuário (mínimo 6 caracteres)
+
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email do usuário
+        password:
+          type: string
+          format: password
+          description: Senha do usuário
+
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - refresh_token
+      properties:
+        token:
+          type: string
+          description: Token JWT de acesso (expira em 24 horas)
+        refresh_token:
+          type: string
+          description: Token JWT de refresh (expira em 7 dias) 

@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Expense API
+  description: API para gerenciamento de despesas pessoais
+  version: 1.0.0
+  contact:
+    name: Sond Anime
+    email: sondanime@gmail.com
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local
+
+tags:
+  - name: Autenticação
+    description: Endpoints para autenticação de usuários
+  - name: Despesas
+    description: Endpoints para gerenciamento de despesas
+
+paths:
+  /api/v1/auth/register:
+    $ref: './paths/auth.yaml#/~1api~1v1~1auth~1register'
+  /api/v1/auth/login:
+    $ref: './paths/auth.yaml#/~1api~1v1~1auth~1login'
+  /api/v1/expenses:
+    $ref: './paths/expenses.yaml#/~1api~1v1~1expenses'
+  /api/v1/expenses/{id}:
+    $ref: './paths/expenses.yaml#/~1api~1v1~1expenses~1{id}'
+
+components:
+  schemas:
+    User:
+      $ref: './components/schemas/User.yaml#/User'
+    CreateUserInput:
+      $ref: './components/schemas/User.yaml#/CreateUserInput'
+    LoginInput:
+      $ref: './components/schemas/User.yaml#/LoginInput'
+    LoginResponse:
+      $ref: './components/schemas/User.yaml#/LoginResponse'
+    Expense:
+      $ref: './components/schemas/Expense.yaml#/Expense'
+    CreateExpenseInput:
+      $ref: './components/schemas/Expense.yaml#/CreateExpenseInput'
+    UpdateExpenseInput:
+      $ref: './components/schemas/Expense.yaml#/UpdateExpenseInput'
+  responses:
+    BadRequest:
+      $ref: './components/responses/BadRequest.yaml'
+    Unauthorized:
+      $ref: './components/responses/Unauthorized.yaml'
+    Conflict:
+      $ref: './components/responses/Conflict.yaml'
+    NotFound:
+      $ref: './components/responses/NotFound.yaml'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Use o token JWT retornado pelo endpoint de login.
+        Exemplo: `Bearer seu_token_jwt` 

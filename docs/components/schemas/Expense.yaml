@@ -1,0 +1,121 @@
+Expense:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: ID único da despesa
+      readOnly: true
+    description:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: Descrição da despesa
+    amount:
+      type: number
+      format: float
+      minimum: 0.01
+      description: Valor da despesa
+    category:
+      type: string
+      enum:
+        - Mantimentos
+        - Lazer
+        - Eletrônica
+        - Utilitários
+        - Roupas
+        - Saúde
+        - Outros
+      description: Categoria da despesa
+    date:
+      type: string
+      format: date
+      description: Data da despesa
+    user_id:
+      type: string
+      format: uuid
+      description: ID do usuário proprietário da despesa
+      readOnly: true
+    created_at:
+      type: string
+      format: date-time
+      description: Data de criação do registro
+      readOnly: true
+    updated_at:
+      type: string
+      format: date-time
+      description: Data da última atualização
+      readOnly: true
+  required:
+    - description
+    - amount
+    - category
+    - date
+
+CreateExpenseInput:
+  type: object
+  properties:
+    description:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: Descrição da despesa
+    amount:
+      type: number
+      format: float
+      minimum: 0.01
+      description: Valor da despesa
+    category:
+      type: string
+      enum:
+        - Mantimentos
+        - Lazer
+        - Eletrônica
+        - Utilitários
+        - Roupas
+        - Saúde
+        - Outros
+      description: Categoria da despesa
+    date:
+      type: string
+      format: date
+      description: Data da despesa
+  required:
+    - description
+    - amount
+    - category
+    - date
+
+UpdateExpenseInput:
+  type: object
+  properties:
+    description:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: Descrição da despesa
+    amount:
+      type: number
+      format: float
+      minimum: 0.01
+      description: Valor da despesa
+    category:
+      type: string
+      enum:
+        - Mantimentos
+        - Lazer
+        - Eletrônica
+        - Utilitários
+        - Roupas
+        - Saúde
+        - Outros
+      description: Categoria da despesa
+    date:
+      type: string
+      format: date
+      description: Data da despesa
+  required:
+    - description
+    - amount
+    - category
+    - date 

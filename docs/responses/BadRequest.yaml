@@ -1,0 +1,17 @@
+description: Requisição inválida
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Dados inválidos na requisição"
+        errors:
+          type: array
+          items:
+            type: string
+          example: 
+            - "O campo email é obrigatório"
+            - "O email informado é inválido"
+            - "A senha deve ter no mínimo 6 caracteres" 

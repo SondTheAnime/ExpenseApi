@@ -1,0 +1,43 @@
+type: object
+required:
+  - description
+  - amount
+  - category
+properties:
+  id:
+    type: string
+    format: uuid
+    readOnly: true
+  description:
+    type: string
+    minLength: 3
+    maxLength: 255
+  amount:
+    type: number
+    format: float
+    minimum: 0.01
+  category:
+    type: string
+    enum:
+      - Mantimentos
+      - Lazer
+      - Eletrônica
+      - Utilitários
+      - Roupas
+      - Saúde
+      - Outros
+  date:
+    type: string
+    format: date
+  userId:
+    type: string
+    format: uuid
+    readOnly: true
+  createdAt:
+    type: string
+    format: date-time
+    readOnly: true
+  updatedAt:
+    type: string
+    format: date-time
+    readOnly: true 
