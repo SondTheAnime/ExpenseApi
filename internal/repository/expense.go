@@ -12,18 +12,27 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// ExpenseRepository gerencia o acesso aos dados de despesas no banco
-type ExpenseRepository struct {
+// ExpenseRepository é a interface que define os métodos do repositório de despesas
+type ExpenseRepository interface {
+	Create(ctx context.Context, expense *model.Expense) error
+	GetByID(ctx context.Context, id string, userID string) (*model.Expense, error)
+	List(ctx context.Context, userID string, filter *model.ExpenseFilter) ([]*model.Expense, error)
+	Update(ctx context.Context, expense *model.Expense) error
+	Delete(ctx context.Context, id string, userID string) error
+}
+
+// PostgresExpenseRepository gerencia o acesso aos dados de despesas no banco
+type PostgresExpenseRepository struct {
 	db *pgxpool.Pool
 }
 
 // NewExpenseRepository cria uma nova instância do repositório de despesas
-func NewExpenseRepository(db *pgxpool.Pool) *ExpenseRepository {
-	return &ExpenseRepository{db: db}
+func NewExpenseRepository(db *pgxpool.Pool) ExpenseRepository {
+	return &PostgresExpenseRepository{db: db}
 }
 
 // Create insere uma nova despesa no banco de dados
-func (r *ExpenseRepository) Create(ctx context.Context, expense *model.Expense) error {
+func (r *PostgresExpenseRepository) Create(ctx context.Context, expense *model.Expense) error {
 	query := `
 		INSERT INTO expenses (id, user_id, amount, description, category, date, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -48,7 +57,7 @@ func (r *ExpenseRepository) Create(ctx context.Context, expense *model.Expense) 
 }
 
 // GetByID busca uma despesa pelo ID
-func (r *ExpenseRepository) GetByID(ctx context.Context, id string, userID string) (*model.Expense, error) {
+func (r *PostgresExpenseRepository) GetByID(ctx context.Context, id string, userID string) (*model.Expense, error) {
 	query := `
 		SELECT id, user_id, amount, description, category, date, created_at, updated_at
 		FROM expenses
@@ -75,7 +84,7 @@ func (r *ExpenseRepository) GetByID(ctx context.Context, id string, userID strin
 }
 
 // List retorna todas as despesas de um usuário com filtros opcionais
-func (r *ExpenseRepository) List(ctx context.Context, userID string, filter *model.ExpenseFilter) ([]*model.Expense, error) {
+func (r *PostgresExpenseRepository) List(ctx context.Context, userID string, filter *model.ExpenseFilter) ([]*model.Expense, error) {
 	query := `
 		SELECT id, user_id, amount, description, category, date, created_at, updated_at
 		FROM expenses
@@ -133,7 +142,7 @@ func (r *ExpenseRepository) List(ctx context.Context, userID string, filter *mod
 }
 
 // Update atualiza uma despesa existente
-func (r *ExpenseRepository) Update(ctx context.Context, expense *model.Expense) error {
+func (r *PostgresExpenseRepository) Update(ctx context.Context, expense *model.Expense) error {
 	query := `
 		UPDATE expenses
 		SET amount = $1, description = $2, category = $3, date = $4, updated_at = $5
@@ -164,7 +173,7 @@ func (r *ExpenseRepository) Update(ctx context.Context, expense *model.Expense) 
 }
 
 // Delete remove uma despesa do banco de dados
-func (r *ExpenseRepository) Delete(ctx context.Context, id string, userID string) error {
+func (r *PostgresExpenseRepository) Delete(ctx context.Context, id string, userID string) error {
 	query := `DELETE FROM expenses WHERE id = $1 AND user_id = $2`
 
 	result, err := r.db.Exec(ctx, query, id, userID)

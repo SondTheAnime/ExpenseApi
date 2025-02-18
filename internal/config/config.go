@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -10,8 +11,8 @@ import (
 
 type Config struct {
 	DB     DBConfig
-	Server ServerConfig
 	JWT    JWTConfig
+	Server ServerConfig
 }
 
 type DBConfig struct {
@@ -19,12 +20,8 @@ type DBConfig struct {
 	Port     string
 	User     string
 	Password string
-	DBName   string
+	Name     string
 	SSLMode  string
-}
-
-type ServerConfig struct {
-	Port string
 }
 
 type JWTConfig struct {
@@ -33,45 +30,50 @@ type JWTConfig struct {
 	RefreshToken time.Duration
 }
 
+type ServerConfig struct {
+	Port string
+}
+
+func (c *DBConfig) DSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		c.Host, c.Port, c.User, c.Password, c.Name, c.SSLMode,
+	)
+}
+
 func New() *Config {
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("Aviso: arquivo .env não encontrado: %v\n", err)
+	}
+
+	expiresIn, _ := strconv.Atoi(getEnv("JWT_EXPIRES_IN", "3600"))
+	refreshToken, _ := strconv.Atoi(getEnv("JWT_REFRESH_TOKEN", "604800"))
+
 	return &Config{
 		DB: DBConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnv("DB_PORT", "5432"),
-			User:     getEnv("DB_USER", "expense_user"),
-			Password: getEnv("DB_PASSWORD", "expense_password"),
-			DBName:   getEnv("DB_NAME", "expense_db"),
+			User:     getEnv("DB_USER", "postgres"),
+			Password: getEnv("DB_PASSWORD", "postgres"),
+			Name:     getEnv("DB_NAME", "expense_db"),
 			SSLMode:  getEnv("DB_SSL_MODE", "disable"),
+		},
+		JWT: JWTConfig{
+			Secret:       getEnv("JWT_SECRET", "seu_segredo_jwt"),
+			ExpiresIn:    time.Duration(expiresIn) * time.Second,
+			RefreshToken: time.Duration(refreshToken) * time.Second,
 		},
 		Server: ServerConfig{
 			Port: getEnv("PORT", "8081"),
 		},
-		JWT: JWTConfig{
-			Secret:       getEnv("JWT_SECRET", "seu_secret_muito_secreto"),
-			ExpiresIn:    parseDuration(getEnv("JWT_EXPIRES_IN", "24h")),
-			RefreshToken: parseDuration(getEnv("JWT_REFRESH_TOKEN_EXPIRES", "168h")),
-		},
 	}
-}
-
-func (c *DBConfig) DSN() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode)
 }
 
 func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
+	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
 	return defaultValue
-}
-
-func parseDuration(value string) time.Duration {
-	duration, err := time.ParseDuration(value)
-	if err != nil {
-		return 24 * time.Hour
-	}
-	return duration
 }
 
 // Load carrega as configurações do ambiente
@@ -86,7 +88,7 @@ func Load() (*Config, error) {
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "expense_user"),
 			Password: getEnv("DB_PASSWORD", "expense_password"),
-			DBName:   getEnv("DB_NAME", "expense_db"),
+			Name:     getEnv("DB_NAME", "expense_db"),
 			SSLMode:  getEnv("DB_SSL_MODE", "disable"),
 		},
 		Server: ServerConfig{
@@ -117,7 +119,7 @@ func Load() (*Config, error) {
 	if config.DB.Password == "" {
 		return nil, fmt.Errorf("DB_PASSWORD não definida")
 	}
-	if config.DB.DBName == "" {
+	if config.DB.Name == "" {
 		return nil, fmt.Errorf("DB_NAME não definida")
 	}
 	if config.DB.SSLMode == "" {
@@ -128,4 +130,12 @@ func Load() (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func parseDuration(value string) time.Duration {
+	duration, err := time.ParseDuration(value)
+	if err != nil {
+		return 24 * time.Hour
+	}
+	return duration
 }

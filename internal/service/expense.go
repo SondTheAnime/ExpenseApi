@@ -10,11 +10,11 @@ import (
 
 // ExpenseService gerencia a lógica de negócios relacionada a despesas
 type ExpenseService struct {
-	repo *repository.ExpenseRepository
+	repo repository.ExpenseRepository
 }
 
 // NewExpenseService cria uma nova instância do serviço de despesas
-func NewExpenseService(repo *repository.ExpenseRepository) *ExpenseService {
+func NewExpenseService(repo repository.ExpenseRepository) *ExpenseService {
 	return &ExpenseService{repo: repo}
 }
 
