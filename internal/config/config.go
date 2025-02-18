@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -70,4 +72,60 @@ func parseDuration(value string) time.Duration {
 		return 24 * time.Hour
 	}
 	return duration
+}
+
+// Load carrega as configurações do ambiente
+func Load() (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		return nil, fmt.Errorf("erro ao carregar .env: %w", err)
+	}
+
+	config := &Config{
+		DB: DBConfig{
+			Host:     getEnv("DB_HOST", "localhost"),
+			Port:     getEnv("DB_PORT", "5432"),
+			User:     getEnv("DB_USER", "expense_user"),
+			Password: getEnv("DB_PASSWORD", "expense_password"),
+			DBName:   getEnv("DB_NAME", "expense_db"),
+			SSLMode:  getEnv("DB_SSL_MODE", "disable"),
+		},
+		Server: ServerConfig{
+			Port: getEnv("PORT", "8081"),
+		},
+		JWT: JWTConfig{
+			Secret:       getEnv("JWT_SECRET", "seu_secret_muito_secreto"),
+			ExpiresIn:    parseDuration(getEnv("JWT_EXPIRES_IN", "24h")),
+			RefreshToken: parseDuration(getEnv("JWT_REFRESH_TOKEN_EXPIRES", "168h")),
+		},
+	}
+
+	// Valores padrão
+	if config.Server.Port == "" {
+		config.Server.Port = "8080"
+	}
+
+	// Validações
+	if config.DB.Host == "" {
+		return nil, fmt.Errorf("DB_HOST não definida")
+	}
+	if config.DB.Port == "" {
+		return nil, fmt.Errorf("DB_PORT não definida")
+	}
+	if config.DB.User == "" {
+		return nil, fmt.Errorf("DB_USER não definida")
+	}
+	if config.DB.Password == "" {
+		return nil, fmt.Errorf("DB_PASSWORD não definida")
+	}
+	if config.DB.DBName == "" {
+		return nil, fmt.Errorf("DB_NAME não definida")
+	}
+	if config.DB.SSLMode == "" {
+		return nil, fmt.Errorf("DB_SSL_MODE não definida")
+	}
+	if config.JWT.Secret == "" {
+		return nil, fmt.Errorf("JWT_SECRET não definida")
+	}
+
+	return config, nil
 }

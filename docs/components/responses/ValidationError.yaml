@@ -1,0 +1,18 @@
+description: Erro de validação dos dados de entrada
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensagem descritiva do erro de validação
+      required:
+        - message
+    examples:
+      email_invalido:
+        value:
+          message: "email inválido"
+      senha_curta:
+        value:
+          message: "senha deve ter no mínimo 6 caracteres" 
