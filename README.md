@@ -96,12 +96,15 @@ cp .env.example .env
 
 3. Prepare o banco de dados
 ```bash
-make db-init
+docker-compose up -d postgres
+docker-compose exec postgres psql -U expense_user -d postgres -f /docker-entrypoint-initdb.d/init.sql
 ```
 
 4. Execute os testes
 ```bash
-make test
+make test          # Executa todos os testes (unitários e integração)
+make test-unit     # Executa apenas testes unitários
+make test-integration  # Executa apenas testes de integração
 ```
 
 5. Inicie o servidor
@@ -112,7 +115,7 @@ make run
 ## 📚 Documentação da API
 
 A documentação completa da API está disponível em:
-- Swagger UI: http://localhost:8080/swagger
+- Swagger UI: http://localhost:8081/docs
 - OpenAPI Spec: `/docs/api.yaml`
 
 ### Endpoints Principais
@@ -133,11 +136,20 @@ A documentação completa da API está disponível em:
 O projeto inclui testes unitários e de integração:
 
 ```bash
-# Executar todos os testes
+# Executar todos os testes (inclui criação do banco de teste)
 make test
+
+# Executar apenas testes unitários
+make test-unit
+
+# Executar apenas testes de integração
+make test-integration
 
 # Executar testes com cobertura
 make test-coverage
+
+# Limpar arquivos de cobertura
+make clean
 ```
 
 ## 📈 Métricas de Qualidade
